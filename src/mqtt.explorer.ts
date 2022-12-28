@@ -60,7 +60,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     }));
 
     this.broker.preConnect = (client: Client, packet: ConnectPacket, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers, true), {
         client,
         packet,
         callback,
@@ -72,7 +72,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     });
 
     this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHENTICATE, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHENTICATE, providers, true), {
         client,
         callback,
         username,
@@ -81,7 +81,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     };
 
     this.broker.authorizePublish = (client: Client, packet: PublishPacket, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers, true), {
         client,
         packet,
         callback,
@@ -89,7 +89,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     };
 
     this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE, providers, true), {
         client,
         subscription: [subscription],
         callback,
@@ -97,14 +97,14 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     };
 
     this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_FORWARD, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_FORWARD, providers, true), {
         client,
         packet,
       });
     };
 
     this.broker.published = (packet: PublishPacket, client: Client, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PUBLISHED, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PUBLISHED, providers, true), {
         client,
         packet,
         callback,
@@ -127,53 +127,53 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     });
 
     this.broker.on('clientReady', (client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT_READY, providers), { client });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT_READY, providers, true), { client });
     });
 
     this.broker.on('client', (client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT, providers), { client });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT, providers, true), { client });
     });
 
     this.broker.on('clientError', (client: Client, error: Error) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT_ERROR, providers), { client, error });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT_ERROR, providers, true), { client, error });
     });
 
     this.broker.on('subscribe', (subscription: Subscription[], client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.SUBSCRIBES, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.SUBSCRIBES, providers, true), {
         client,
         subscription,
       });
     });
 
     this.broker.on('unsubscribe', (unsubscription: string[], client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.UNSUBSCRIBES, providers), {
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.UNSUBSCRIBES, providers, true), {
         client,
         unsubscription,
       });
     });
 
     this.broker.on('ping', (packet: PingreqPacket, client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PING, providers), { client, packet });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PING, providers, true), { client, packet });
     });
 
     this.broker.on('connectionError', (client: Client, error: Error) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CONNECTION_ERROR, providers), { client, error });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CONNECTION_ERROR, providers, true), { client, error });
     });
 
     this.broker.on('keepaliveTimeout', (client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.KEEP_LIVE_TIMEOUT, providers), { client });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.KEEP_LIVE_TIMEOUT, providers, true), { client });
     });
 
     this.broker.on('ack', (packet: PublishPacket | PubrelPacket, client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.ACK, providers), { client, packet });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.ACK, providers, true), { client, packet });
     });
 
     this.broker.on('closed', () => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLOSED, providers));
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLOSED, providers, true));
     });
 
     this.broker.on('connackSent', (packet: ConnackPacket, client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CONNACK_SENT, providers), { client, packet });
+      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CONNACK_SENT, providers, true), { client, packet });
     });
 
     for (const provider of providers) {
@@ -229,7 +229,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
       return (isRegExp(metaKey) && metaKey.test(p.meta)) || p.meta === metaKey;
     });
     if (single && subscribers.length > 0) {
-      return subscribers[0];
+      return [subscribers[0]];
     }
     return subscribers;
   }

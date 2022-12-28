@@ -24,6 +24,7 @@
   },
   "homepage": "https://gitlab.alphaport.at/libraries/nestjs-eureka#readme",
   "scripts": {
+    "prepack": "npm run build",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
