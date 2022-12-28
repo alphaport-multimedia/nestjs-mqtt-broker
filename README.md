@@ -1,6 +1,6 @@
 
-[![pipeline status](https://github.com/Alphaport-OG/nestjs-mqtt-broker/actions/workflows/node.js.yml/badge.svg)](https://github.com/alphaport-og/nestjs-mqtt-broker/commits/main)
-[![publish status](https://github.com/Alphaport-OG/nestjs-mqtt-broker/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/alphaport-og/nestjs-mqtt-broker/commits/main)
+[![pipeline status](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/actions/workflows/node.js.yml/badge.svg)](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/commits/main)
+[![publish status](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/commits/main)
 [![npm](https://img.shields.io/npm/v/nestjs-email)](https://www.npmjs.com/package/nestjs-email)
 
 
