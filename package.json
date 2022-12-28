@@ -1,6 +1,6 @@
 {
   "name": "@alphaport/nestjs-mqtt-broker",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A NestJS module that launches an ",
   "author": "Sebastian Geschke <sebastian.geschke@gmail.com>",
   "license": "MIT",
