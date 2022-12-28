@@ -1,7 +1,7 @@
 
 [![pipeline status](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/actions/workflows/node.js.yml/badge.svg)](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/commits/main)
 [![publish status](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/alphaport-multimedia/nestjs-mqtt-broker/commits/main)
-[![npm](https://img.shields.io/npm/v/nestjs-email)](https://www.npmjs.com/package/nestjs-email)
+[![npm](https://img.shields.io/npm/v/nestjs-mqtt-broker)](https://www.npmjs.com/package/nestjs-mqtt-broker)
 
 
 `nestjs-mqtt-broker` is a [NestJS](https://nestjs.com/) module that provides an integration with [aedes](https://github.com/moscajs/aedes) MQTT broker

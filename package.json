@@ -1,5 +1,5 @@
 {
-  "name": "@alphaport/nestjs-mqtt-broker",
+  "name": "nestjs-mqtt-broker",
   "version": "0.0.1",
   "description": "A NestJS module that launches an ",
   "author": "Sebastian Geschke <sebastian.geschke@gmail.com>",
@@ -8,7 +8,7 @@
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.alphaport.at/libraries/nestjs-eureka.git"
+    "url": "git+ssh://git@github.com:alphaport-multimedia/nestjs-mqtt-broker.git"
   },
   "keywords": [
     "nestjs",
@@ -20,9 +20,9 @@
     "dist"
   ],
   "bugs": {
-    "url": "https://gitlab.alphaport.at/libraries/nestjs-eureka/issues"
+    "url": "https://github.com/alphaport-multimedia/nestjs-mqtt-broker/issues"
   },
-  "homepage": "https://gitlab.alphaport.at/libraries/nestjs-eureka#readme",
+  "homepage": "https://github.com/alphaport-multimedia/nestjs-mqtt-broker",
   "scripts": {
     "prepack": "npm run build",
     "prebuild": "rimraf dist",
