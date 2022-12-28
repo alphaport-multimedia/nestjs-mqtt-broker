@@ -1,0 +1,39 @@
+stages:
+  - test
+  - build
+  - publish
+
+npm-lint:
+  image: node:10-alpine
+  stage: test
+  script:
+    - npm install
+    - npm run lint
+
+npm-test:
+  image: node:10-alpine
+  stage: test
+  script:
+    - npm install
+    - npm run test
+
+npm-build:
+  image: node:10-alpine
+  stage: build
+  artifacts:
+    expire_in: 30 mins
+    paths:
+      - dist
+  script:
+    - npm install
+    - npm run build
+
+npm-publish:
+  image: node:10-alpine
+  stage: publish
+  only:
+    - tags
+  script:
+    - npm version --allow-same-version --no-git-tag-version ${CI_COMMIT_REF_NAME}
+    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}">.npmrc
+    - npm publish
