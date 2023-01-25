@@ -1,6 +1,6 @@
 {
   "name": "nestjs-mqtt-broker",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A NestJS module that launches an aedes mqtt broker",
   "author": "Sebastian Geschke <sebastian.geschke@gmail.com>",
   "license": "MIT",
