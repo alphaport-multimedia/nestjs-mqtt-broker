@@ -42,7 +42,8 @@
     "@nestjs/common": "^9.2.1",
     "@nestjs/core": "^9.2.1",
     "aedes": "^0.48.0",
-    "aedes-server-factory": "^0.2.1"
+    "aedes-server-factory": "^0.2.1",
+    "websocket-stream": "^5.5.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.1.7",
