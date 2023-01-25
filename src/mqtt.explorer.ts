@@ -59,57 +59,79 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
       params: this.getMethodParameters(p),
     }));
 
-    this.broker.preConnect = (client: Client, packet: ConnectPacket, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers, true), {
-        client,
-        packet,
-        callback,
-      });
-    };
+    const preConnect = this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers, true)
 
-    this.broker.on('clientDisconnect', (client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT_DISCONNECT, providers), { client });
-    });
+    if (preConnect.length > 0) {
+      this.broker.preConnect = (client: Client, packet: ConnectPacket, callback) => {
+        this.processHandlerListener(preConnect, {
+          client,
+          packet,
+          callback,
+        });
+      };
+    }
 
-    this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHENTICATE, providers, true), {
-        client,
-        callback,
-        username,
-        password,
+    const clientDisconnect = this.getSubscribers(SystemTopicsEnum.CLIENT_DISCONNECT, providers);
+    if (clientDisconnect.length > 0) {
+      this.broker.on('clientDisconnect', (client: Client) => {
+        this.processHandlerListener(clientDisconnect, { client });
       });
-    };
+    }
 
-    this.broker.authorizePublish = (client: Client, packet: PublishPacket, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers, true), {
-        client,
-        packet,
-        callback,
-      });
-    };
+    const authenticate = this.getSubscribers(SystemTopicsEnum.AUTHENTICATE, providers, true);
+    if (authenticate.length > 0) {
+      this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, callback) => {
+        this.processHandlerListener(authenticate, {
+          client,
+          callback,
+          username,
+          password,
+        });
+      };
+    }
 
-    this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE, providers, true), {
-        client,
-        subscription: [subscription],
-        callback,
-      });
-    };
+    const authorizePublish = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers, true)
+    if (authorizePublish.length > 0) {
+      this.broker.authorizePublish = (client: Client, packet: PublishPacket, callback) => {
+        this.processHandlerListener(authorizePublish, {
+          client,
+          packet,
+          callback,
+        });
+      };
+    }
 
-    this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.AUTHORIZE_FORWARD, providers, true), {
-        client,
-        packet,
-      });
-    };
+    const authorizeSubscribe = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE, providers, true);
+    if (authorizeSubscribe.length > 0){
+      this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
+        this.processHandlerListener(authorizeSubscribe, {
+          client,
+          subscription: [subscription],
+          callback,
+        });
+      };
+    }
 
-    this.broker.published = (packet: PublishPacket, client: Client, callback) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PUBLISHED, providers, true), {
-        client,
-        packet,
-        callback,
-      });
-    };
+    const authorizeForward = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_FORWARD, providers, true);
+    if (authorizeForward.length > 0){
+      this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
+        this.processHandlerListener(authorizeForward, {
+          client,
+          packet,
+        });
+      };
+    }
+
+    const published = this.getSubscribers(SystemTopicsEnum.PUBLISHED, providers, true);
+    if (published.length > 0){
+      this.broker.published = (packet: PublishPacket, client: Client, callback) => {
+        this.processHandlerListener(published, {
+          client,
+          packet,
+          callback,
+        });
+      };
+    }
 
     this.broker.on('publish', (packet: PublishPacket, client: Client) => {
       let subscriber = [];
@@ -126,55 +148,87 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
       this.processHandlerListener(subscriber, { client, packet });
     });
 
-    this.broker.on('clientReady', (client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT_READY, providers, true), { client });
-    });
-
-    this.broker.on('client', (client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT, providers, true), { client });
-    });
-
-    this.broker.on('clientError', (client: Client, error: Error) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLIENT_ERROR, providers, true), { client, error });
-    });
-
-    this.broker.on('subscribe', (subscription: Subscription[], client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.SUBSCRIBES, providers, true), {
-        client,
-        subscription,
+    const clientReady = this.getSubscribers(SystemTopicsEnum.CLIENT_READY, providers, true);
+    if (clientReady.length > 0) {
+      this.broker.on('clientReady', (client: Client) => {
+        this.processHandlerListener(clientReady, { client });
       });
-    });
+    }
 
-    this.broker.on('unsubscribe', (unsubscription: string[], client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.UNSUBSCRIBES, providers, true), {
-        client,
-        unsubscription,
+    const client = this.getSubscribers(SystemTopicsEnum.CLIENT, providers, true);
+    if (client.length > 0) {
+      this.broker.on('client', (c: Client) => {
+        this.processHandlerListener(client, { client: c });
       });
-    });
+    }
+    const clientError = this.getSubscribers(SystemTopicsEnum.CLIENT_ERROR, providers, true);
+    if (clientError.length > 0) {
+      this.broker.on('clientError', (client: Client, error: Error) => {
+        this.processHandlerListener(clientError, { client, error });
+      });
+    }
 
-    this.broker.on('ping', (packet: PingreqPacket, client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.PING, providers, true), { client, packet });
-    });
+    const subscribe = this.getSubscribers(SystemTopicsEnum.SUBSCRIBES, providers, true);
+    if (subscribe.length > 0) {
+      this.broker.on('subscribe', (subscription: Subscription[], client: Client) => {
+        this.processHandlerListener(subscribe, {
+          client,
+          subscription,
+        });
+      });
+    }
 
-    this.broker.on('connectionError', (client: Client, error: Error) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CONNECTION_ERROR, providers, true), { client, error });
-    });
+    const unsubscribe = this.getSubscribers(SystemTopicsEnum.UNSUBSCRIBES, providers, true);
+    if (unsubscribe.length > 0){
+      this.broker.on('unsubscribe', (unsubscription: string[], client: Client) => {
+        this.processHandlerListener(unsubscribe, {
+          client,
+          unsubscription,
+        });
+      });
+    }
 
-    this.broker.on('keepaliveTimeout', (client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.KEEP_LIVE_TIMEOUT, providers, true), { client });
-    });
+    const ping = this.getSubscribers(SystemTopicsEnum.PING, providers, true);
+    if (ping.length > 0) {
+      this.broker.on('ping', (packet: PingreqPacket, client: Client) => {
+        this.processHandlerListener(ping, { client, packet });
+      });
+    }
 
-    this.broker.on('ack', (packet: PublishPacket | PubrelPacket, client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.ACK, providers, true), { client, packet });
-    });
+    const connectionError = this.getSubscribers(SystemTopicsEnum.CONNECTION_ERROR, providers, true);
+    if (connectionError.length > 0) {
+      this.broker.on('connectionError', (client: Client, error: Error) => {
+        this.processHandlerListener(connectionError, { client, error });
+      });
+    }
 
-    this.broker.on('closed', () => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CLOSED, providers, true));
-    });
+    const keepaliveTimeout = this.getSubscribers(SystemTopicsEnum.KEEP_LIVE_TIMEOUT, providers, true);
+    if (keepaliveTimeout.length > 0) {
+      this.broker.on('keepaliveTimeout', (client: Client) => {
+        this.processHandlerListener(keepaliveTimeout, { client });
+      });
+    }
 
-    this.broker.on('connackSent', (packet: ConnackPacket, client: Client) => {
-      this.processHandlerListener(this.getSubscribers(SystemTopicsEnum.CONNACK_SENT, providers, true), { client, packet });
-    });
+    const ack = this.getSubscribers(SystemTopicsEnum.ACK, providers, true);
+    if (ack.length > 0) {
+      this.broker.on('ack', (packet: PublishPacket | PubrelPacket, client: Client) => {
+        this.processHandlerListener(ack, { client, packet });
+      });
+    }
+
+    const closed = this.getSubscribers(SystemTopicsEnum.CLOSED, providers, true);
+    if (closed.length > 0) {
+      this.broker.on('closed', () => {
+        this.processHandlerListener(closed);
+      });
+    }
+
+    const connackSent = this.getSubscribers(SystemTopicsEnum.CONNACK_SENT, providers, true);
+    if (connackSent.length > 0) {
+     this.broker.on('connackSent', (packet: ConnackPacket, client: Client) => {
+        this.processHandlerListener(connackSent, { client, packet });
+      });
+    }
 
     for (const provider of providers) {
       this.logger.log(
