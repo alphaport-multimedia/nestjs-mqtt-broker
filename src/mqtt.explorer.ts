@@ -25,7 +25,8 @@ type DiscoveredMethodWithMetaAndParameters<T> = DiscoveredMethodWithMeta<T> & {
 type HandlerMethodParameters = {
   client?: Client;
   packet?: IPacket;
-  subscription?: Subscription[];
+  subscription?: Subscription;
+  subscriptions?: Subscription[];
   unsubscription?: string[];
   callback?: (...args: unknown[]) => unknown;
   username?: string;
@@ -106,7 +107,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
       this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
         this.processHandlerListener(authorizeSubscribe, {
           client,
-          subscription: [subscription],
+          subscription: subscription,
           callback,
         });
       };
@@ -170,10 +171,10 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
 
     const subscribe = this.getSubscribers(SystemTopicsEnum.SUBSCRIBES, providers, true);
     if (subscribe.length > 0) {
-      this.broker.on('subscribe', (subscription: Subscription[], client: Client) => {
+      this.broker.on('subscribe', (subscriptions: Subscription[], client: Client) => {
         this.processHandlerListener(subscribe, {
           client,
-          subscription,
+          subscriptions,
         });
       });
     }
@@ -304,6 +305,8 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
           return params?.callback;
         case 'subscription':
           return params?.subscription;
+        case 'subscriptions':
+          return params?.subscriptions;
         case 'payload':
           return getTransform(parameter.transform)((params?.packet as PublishPacket).payload);
         case 'error':

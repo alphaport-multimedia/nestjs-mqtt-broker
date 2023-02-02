@@ -149,11 +149,16 @@ export function Subscription() {
     type: 'subscription',
   });
 }
+export function Subscriptions() {
+  return SetParameter({
+    type: 'subscriptions',
+  });
+}
 
 export function Function() {
   return SetParameter({
     type: 'function',
-    transform: (s) => s,
+    transform: s => s,
   });
 }
 

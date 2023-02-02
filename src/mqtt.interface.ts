@@ -37,6 +37,7 @@ export interface MqttSubscriberParameter {
     | 'client'
     | 'host'
     | 'subscription'
+    | 'subscriptions'
     | 'function'
     | 'credential';
   transform?: 'json' | 'text' | MqttMessageTransformer<unknown>;
