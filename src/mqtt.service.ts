@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Aedes } from 'aedes';
+import Aedes from 'aedes/types/instance';
 import { INSTANCE_BROKER } from './mqtt.constant';
 import { PubPacket } from './mqtt.interface';
 
