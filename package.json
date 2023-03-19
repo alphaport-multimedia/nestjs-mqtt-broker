@@ -23,6 +23,7 @@
     "url": "https://github.com/alphaport-multimedia/nestjs-mqtt-broker/issues"
   },
   "homepage": "https://github.com/alphaport-multimedia/nestjs-mqtt-broker",
+  "include": ["src/*.ts"],
   "scripts": {
     "prepack": "npm run build",
     "prebuild": "rimraf dist",
