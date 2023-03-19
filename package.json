@@ -17,7 +17,8 @@
     "aedes"
   ],
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "bugs": {
     "url": "https://github.com/alphaport-multimedia/nestjs-mqtt-broker/issues"
@@ -41,8 +42,7 @@
     "@golevelup/nestjs-discovery": "^3.0.0",
     "@nestjs/common": "^9.2.1",
     "@nestjs/core": "^9.2.1",
-    "aedes": "^0.48.0",
-    "aedes-server-factory": "^0.2.1",
+    "aedes": "^0.49.0",
     "websocket-stream": "^5.5.2"
   },
   "devDependencies": {

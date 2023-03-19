@@ -18,7 +18,8 @@ npm i @alphaport/nestjs-mqtt-broker
 @Module({
   imports: [
     MqttModule.forRoot({
-      port: 1884,
+      port: "1883", // Port MQTT TCP Server
+      portWS: "1884", // Port MQTT WebSocket Server
       id: "mqtt-broker",
       concurrency:100,
       queueLimit:42,

@@ -1,10 +1,10 @@
 import { DiscoveredMethodWithMeta, DiscoveryService } from '@golevelup/nestjs-discovery';
 import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Aedes } from 'aedes';
-import { Client } from 'aedes:client';
+import Aedes from 'aedes/types/instance';
+import { Client } from 'aedes';
 
-import { ConnackPacket, ConnectPacket, PingreqPacket, PublishPacket, PubrelPacket, Subscription } from 'aedes:packet';
+import { ConnackPacket, ConnectPacket, PingreqPacket, PublishPacket, PubrelPacket, Subscription } from 'aedes';
 import { IPacket } from 'mqtt-packet';
 import { isRegExp } from 'util/types';
 import {
@@ -13,7 +13,7 @@ import {
   KEY_SUBSCRIBE_OPTIONS,
   OPTION_PROVIDER,
   SystemTopicRegexEnum,
-  SystemTopicsEnum
+  SystemTopicsEnum,
 } from './mqtt.constant';
 import { MqttModuleOptions, MqttSubscriberParameter } from './mqtt.interface';
 import { getTransform } from './mqtt.transfrom';
@@ -22,7 +22,7 @@ type DiscoveredMethodWithMetaAndParameters<T> = DiscoveredMethodWithMeta<T> & {
   params: MqttSubscriberParameter[];
 };
 
-type HandlerMethodParameters = {
+interface HandlerMethodParameters {
   client?: Client;
   packet?: IPacket;
   subscription?: Subscription;
@@ -32,7 +32,8 @@ type HandlerMethodParameters = {
   username?: string;
   password?: Readonly<Buffer>;
   error?;
-};
+}
+
 @Injectable()
 export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
   private readonly logger: Logger = new Logger(MqttExplorer.name);
@@ -41,8 +42,9 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
   constructor(
     private readonly discoveryService: DiscoveryService,
     @Inject(OPTION_PROVIDER) private readonly options: MqttModuleOptions,
-    @Inject(INSTANCE_BROKER) private readonly broker: Aedes
-  ) {}
+    @Inject(INSTANCE_BROKER) private readonly broker: Aedes,
+  ) {
+  }
 
   onModuleInit() {
     this.init();
@@ -53,14 +55,14 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
   }
 
   async init() {
-    const providers: DiscoveredMethodWithMetaAndParameters<string>[] = (
+    const providers: Array<DiscoveredMethodWithMetaAndParameters<string>> = (
       await this.discoveryService.providerMethodsWithMetaAtKey<string>(KEY_SUBSCRIBE_OPTIONS)
     ).map((p) => ({
       ...p,
       params: this.getMethodParameters(p),
     }));
 
-    const preConnect = this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers, true)
+    const preConnect = this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers, true);
 
     if (preConnect.length > 0) {
       this.broker.preConnect = (client: Client, packet: ConnectPacket, callback) => {
@@ -91,7 +93,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
       };
     }
 
-    const authorizePublish = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers, true)
+    const authorizePublish = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers, true);
     if (authorizePublish.length > 0) {
       this.broker.authorizePublish = (client: Client, packet: PublishPacket, callback) => {
         this.processHandlerListener(authorizePublish, {
@@ -103,18 +105,18 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     }
 
     const authorizeSubscribe = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE, providers, true);
-    if (authorizeSubscribe.length > 0){
+    if (authorizeSubscribe.length > 0) {
       this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
         this.processHandlerListener(authorizeSubscribe, {
           client,
-          subscription: subscription,
+          subscription,
           callback,
         });
       };
     }
 
     const authorizeForward = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_FORWARD, providers, true);
-    if (authorizeForward.length > 0){
+    if (authorizeForward.length > 0) {
       this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
         this.processHandlerListener(authorizeForward, {
           client,
@@ -124,7 +126,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     }
 
     const published = this.getSubscribers(SystemTopicsEnum.PUBLISHED, providers, true);
-    if (published.length > 0){
+    if (published.length > 0) {
       this.broker.published = (packet: PublishPacket, client: Client, callback) => {
         this.processHandlerListener(published, {
           client,
@@ -135,7 +137,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     }
 
     this.broker.on('publish', (packet: PublishPacket, client: Client) => {
-      let subscriber = [];
+      let subscriber;
 
       if (SystemTopicRegexEnum.HEART_BEAT.test(packet.topic)) {
         subscriber = this.getSubscribers(SystemTopicRegexEnum.HEART_BEAT, providers);
@@ -180,7 +182,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
     }
 
     const unsubscribe = this.getSubscribers(SystemTopicsEnum.UNSUBSCRIBES, providers, true);
-    if (unsubscribe.length > 0){
+    if (unsubscribe.length > 0) {
       this.broker.on('unsubscribe', (unsubscription: string[], client: Client) => {
         this.processHandlerListener(unsubscribe, {
           client,
@@ -226,7 +228,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
 
     const connackSent = this.getSubscribers(SystemTopicsEnum.CONNACK_SENT, providers, true);
     if (connackSent.length > 0) {
-     this.broker.on('connackSent', (packet: ConnackPacket, client: Client) => {
+      this.broker.on('connackSent', (packet: ConnackPacket, client: Client) => {
         this.processHandlerListener(connackSent, { client, packet });
       });
     }
@@ -235,19 +237,19 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
       this.logger.log(
         `Mapped {${provider.discoveredMethod.parentClass.name}::${
           provider.discoveredMethod.methodName
-        }, ${provider.params.map((p) => `${p.type}`).join(', ')}} mqtt subscribtion`
+        }, ${provider.params.map((p) => `${p.type}`).join(', ')}} mqtt subscribtion`,
       );
     }
   }
 
   processHandlerListener(
-    subscribers: DiscoveredMethodWithMetaAndParameters<string>[],
-    params?: HandlerMethodParameters
+    subscribers: Array<DiscoveredMethodWithMetaAndParameters<string>>,
+    params?: HandlerMethodParameters,
   ) {
     for (const subscriber of subscribers) {
       try {
         subscriber.discoveredMethod.handler.bind(subscriber.discoveredMethod.parentClass.instance)(
-          ...this.getHandlerMethodParameters(subscriber.params, params)
+          ...this.getHandlerMethodParameters(subscriber.params, params),
         );
       } catch (err) {
         this.logger.error(err);
@@ -265,7 +267,7 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
   private getMethodParameters(subscriber: DiscoveredMethodWithMeta<string>): MqttSubscriberParameter[] {
     const parameters = this.reflector.get<MqttSubscriberParameter[]>(
       KEY_SUBSCRIBER_PARAMS,
-      subscriber.discoveredMethod.handler
+      subscriber.discoveredMethod.handler,
     );
 
     const orderedParameters: MqttSubscriberParameter[] = [];
@@ -277,10 +279,10 @@ export class MqttExplorer implements OnModuleInit, OnApplicationShutdown {
 
   private getSubscribers(
     metaKey: string | RegExp,
-    providers: DiscoveredMethodWithMetaAndParameters<string>[],
-    single = false
-  ): DiscoveredMethodWithMetaAndParameters<string>[] {
-    const subscribers =  providers.filter((p) => {
+    providers: Array<DiscoveredMethodWithMetaAndParameters<string>>,
+    single = false,
+  ): Array<DiscoveredMethodWithMetaAndParameters<string>> {
+    const subscribers = providers.filter((p) => {
       return (isRegExp(metaKey) && metaKey.test(p.meta)) || p.meta === metaKey;
     });
     if (single && subscribers.length > 0) {

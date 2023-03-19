@@ -1,7 +1,6 @@
 import { LoggerService, Type } from '@nestjs/common';
 import { ModuleMetadata } from '@nestjs/common/interfaces';
-import { AedesOptions } from 'aedes';
-import { PublishPacket } from 'aedes:packet';
+import { AedesOptions, PublishPacket } from 'aedes';
 
 export type MqttMessageTransformer<T> = (payload: string | Buffer) => T;
 
@@ -49,7 +48,8 @@ export interface MqttLoggerOptions {
 }
 
 export interface MqttModuleOptions extends AedesOptions {
-  port: string;
+  port?: string;
+  portWS?: string;
 }
 
 export interface MqttOptionsFactory {
